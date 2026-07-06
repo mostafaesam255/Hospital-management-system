@@ -1,0 +1,263 @@
+/* Summary card entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.summary-card {
+  border-left: 5px solid #e74a3b !important;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  background-color: white;
+  border-radius: 8px;
+  /* Specific properties — never `transition: all` */
+  transition: transform  200ms cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  animation: fadeInUp 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* Stagger stat cards */
+.summary-card:nth-child(1) { animation-delay:  0ms; }
+.summary-card:nth-child(2) { animation-delay: 60ms; }
+.summary-card:nth-child(3) { animation-delay:120ms; }
+
+/* Desktop-only hover — touch devices get false positives */
+@media (hover: hover) and (pointer: fine) {
+  .summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1.75rem 0 rgba(58, 59, 69, 0.22);
+  }
+}
+
+.summary-card .card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+.summary-card .icon {
+  font-size: 2.5rem;
+  color: #dddfeb;
+  opacity: 0.3;
+}
+
+.summary-card .title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #858796;
+}
+
+.summary-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #5a5c69;
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+  /* transition from global .badge rule */
+}
+
+.status-ready {
+  background-color: #e6fffa;
+  color: #1a7f64;
+  border: 1px solid #b2f5ea;
+}
+
+.badge-new-result {
+  background-color: #ffeeba;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Vitals Grid */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1rem;
+}
+
+.vital-label {
+  color: #adb5bd;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  display: block;
+}
+
+.vital-value {
+  color: #212529;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: block;
+}
+
+/* Modal layout */
+.modal-body.main-content {
+  padding: 0 !important;
+}
+
+.patient-sidebar {
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+/* Modal footer buttons */
+.modal-footer-actions .btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 500;
+  /* transform comes from global .btn:active rule */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .modal-footer-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.06);
+  }
+}
+
+.btn-submit-consultation {
+  background-color: #4e73df;
+  color: white;
+  border: none;
+}
+
+.btn-submit-consultation:disabled {
+  background-color: #a5b5e6;
+  cursor: not-allowed;
+}
+
+/* Consultation workspace */
+.consultation-workspace {
+  border: 1px solid #e3e6f0;
+}
+
+/* Tab navigation — smooth indicator slide */
+.nav-tabs .nav-link {
+  font-weight: 500;
+  color: #858796;
+  border: none;
+  border-bottom: 2px solid transparent;
+  /* Specific props: color + border only */
+  transition: color       160ms cubic-bezier(0.23, 1, 0.32, 1),
+              border-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.nav-tabs .nav-link.active {
+  color: #4e73df;
+  border-bottom-color: #4e73df;
+  background-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-tabs .nav-link:hover {
+    color: #4e73df;
+    border-bottom-color: #a5b5e6;
+  }
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #e3e6f0;
+}
+
+/* Patient header */
+.patient-header-card {
+  border-left-width: 5px !important;
+}
+
+.patient-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #3a3b45;
+  margin-bottom: 0.1rem;
+}
+
+.patient-id {
+  font-size: 0.9rem;
+  color: #858796;
+  margin-bottom: 0;
+}
+
+.patient-icon {
+  font-size: 3rem !important;
+  color: #a5b5e6 !important;
+  margin-right: 1.5rem !important;
+}
+
+/* AI Diagnostics Dropdown and Modal Styles */
+.dropdown-menu {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  animation: dropdownFadeIn 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: background-color 150ms ease, color 150ms ease, padding-left 150ms ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f7fafc;
+  color: #2b6cb0;
+  padding-left: 1.25rem; /* Subtle indent effect on hover */
+}
+
+/* Modal styling */
+#aiModelModal .modal-content {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#aiModelModal iframe {
+  background-color: #ffffff;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+.font-monospace {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Ensure table responsive allows dropdowns to show fully on desktop screens */
+@media (min-width: 768px) {
+  .table-responsive {
+    overflow: visible !important;
+  }
+}

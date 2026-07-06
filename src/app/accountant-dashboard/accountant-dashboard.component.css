@@ -1,0 +1,96 @@
+/* Component-specific styles for the printable invoice */
+
+#invoice-print-area {
+  display: none; /* Hidden by default, made visible by global print styles */
+}
+
+@media print {
+  #invoice-print-area {
+    display: block; /* Ensure it's a block-level element for printing */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #333;
+    background-color: #fff;
+    padding: 20px;
+  }
+
+  .invoice-header-print {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+  }
+
+  .invoice-header-print h1 {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin: 0;
+    color: #000;
+  }
+
+  .invoice-header-print p {
+    font-size: 1.1em;
+    color: #555;
+    margin: 5px 0 0;
+  }
+
+  .invoice-meta-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    font-size: 1em;
+  }
+
+  .meta-left, .meta-right {
+    flex-basis: 48%;
+  }
+
+  .meta-right {
+    text-align: right;
+  }
+
+  .invoice-meta-info p {
+    margin: 4px 0;
+  }
+
+  .invoice-table-print {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+
+  .invoice-table-print th,
+  .invoice-table-print td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .invoice-table-print thead tr {
+    background-color: #f7f7f7;
+  }
+
+  .invoice-table-print th {
+    font-weight: 600;
+    color: #444;
+  }
+
+  .invoice-table-print .text-end {
+    text-align: right;
+  }
+
+  .invoice-table-print tfoot .grand-total {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #000;
+    border-top: 2px solid #000;
+  }
+
+  .invoice-footer-print {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #777;
+  }
+}

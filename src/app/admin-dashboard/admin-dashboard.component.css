@@ -1,0 +1,157 @@
+
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  padding: 2rem;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Stat Cards — staggered entrance */
+.stat-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #e53935;
+  /* Specific properties — never transition: all */
+  transition: transform  200ms cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  animation: stat-enter 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* Stagger the three stat cards */
+.stat-card:nth-child(1) { animation-delay:  0ms; }
+.stat-card:nth-child(2) { animation-delay: 60ms; }
+.stat-card:nth-child(3) { animation-delay:120ms; }
+
+@keyframes stat-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Desktop-only hover */
+@media (hover: hover) and (pointer: fine) {
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+  }
+}
+
+.stat-card .stat-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.stat-card .stat-icon {
+  font-size: 3rem;
+  color: #e9ecef;
+}
+
+/* Section Card */
+.section-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Primary button — hover desktop only */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+}
+
+/* Table */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  border-top: none;
+}
+
+.table thead th {
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Row background — specific property */
+.table tbody tr {
+  transition: background-color 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .table tbody tr:hover {
+    background-color: rgba(229, 57, 53, 0.05);
+  }
+}
+
+/* Action buttons */
+.action-buttons .btn {
+  background: none;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  color: #6c757d;
+  transition: color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .action-buttons .btn:hover {
+    color: #e53935;
+  }
+}
+
+.action-buttons .btn i {
+  font-size: 1.25rem;
+}
+
+/* Badge — transition from global */
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 600;
+  font-size: 0.75rem;
+}

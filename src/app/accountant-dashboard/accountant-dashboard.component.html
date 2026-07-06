@@ -1,0 +1,156 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Accountant Dashboard</h1>
+
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Patients to Bill</h6>
+        </div>
+        <div class="card-body">
+          <div class="list-group">
+            @for (patient of patientsNeedingBilling(); track patient.id) {
+              <button type="button" class="list-group-item list-group-item-action" [class.active]="selectedPatient()?.id === patient.id" (click)="selectPatient(patient)">
+                {{ patient.name }}
+              </button>
+            } @empty {
+              <p class="text-center text-muted mt-3">No patients are pending billing.</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      @if (selectedPatient(); as patient) {
+        <div class="card shadow mb-4 invoice-card">
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Invoice for {{ patient.name }}</h6>
+            <span class="badge bg-warning text-dark">Pending</span>
+          </div>
+          <div class="card-body">
+            @if (billBreakdown(); as bill) {
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th class="text-end">Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (service of bill.requestedServices; track service.name) {
+                      <tr>
+                        <td>{{ service.name }}</td>
+                        <td class="text-end">{{ service.price | currency:'USD' }}</td>
+                      </tr>
+                    }
+                    @for (investigation of bill.investigations; track investigation.id) {
+                        <tr>
+                            <td>{{ investigation.name }}</td>
+                            <td class="text-end">{{ investigation.price | currency:'USD' }}</td>
+                        </tr>
+                    }
+                    @for (med of bill.prescribedMeds; track med.medicineId) {
+                      <tr>
+                        <td>{{ med.medicineName }}</td>
+                        <td class="text-end">{{ med.price | currency:'USD' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                  <tfoot>
+                    <tr class="fw-bold">
+                      <td class="text-end">Grand Total</td>
+                      <td class="text-end">{{ bill.grandTotal | currency:'USD' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div class="text-end mt-4">
+                <button class="btn btn-primary me-2" (click)="printInvoice()">Print Invoice</button>
+                <button class="btn btn-success" (click)="finalizePayment()">Finalize Payment</button>
+              </div>
+            } @else {
+                 <div class="text-center p-5">
+                    <i class="bi bi-receipt-cutoff" style="font-size: 3rem; color: #e0e0e0;"></i>
+                    <h5 class="mt-3">Select a patient to view their bill.</h5>
+                 </div>
+            }
+          </div>
+        </div>
+      } @else {
+          <div class="card shadow mb-4">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-file-person" style="font-size: 4rem; color: #e0e0e0;"></i>
+                <h5 class="mt-3">Select a patient to get started</h5>
+                <p class="text-muted">Choose a patient from the list on the left to view their billing details and finalize payment.</p>
+            </div>
+          </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Printable Invoice -->
+@if (selectedPatient(); as patient) {
+  <div id="invoice-print-area">
+    @if (billBreakdown(); as bill) {
+      <div class="invoice-header-print">
+        <h1 class="font-weight-bold">HMS Medical Center</h1>
+        <p>Quality Care, Every Step</p>
+      </div>
+
+      <div class="invoice-meta-info">
+        <div class="meta-left">
+          <p><strong>Patient Name:</strong> {{ patient.name }}</p>
+          <p><strong>National ID:</strong> {{ patient.nationalId }}</p>
+          <p><strong>Phone:</strong> {{ patient.contact || 'N/A' }}</p>
+        </div>
+        <div class="meta-right">
+          <p><strong>Invoice #:</strong> {{ patient.id.slice(0, 8) }}</p>
+          <p><strong>Date:</strong> {{ today | date: 'longDate' }}</p>
+        </div>
+      </div>
+
+      <table class="invoice-table-print">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="text-end">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (service of bill.requestedServices; track service.name) {
+            <tr>
+              <td>{{ service.name }}</td>
+              <td class="text-end">{{ service.price | currency:'USD' }}</td>
+            </tr>
+          }
+          @for (investigation of bill.investigations; track investigation.id) {
+            <tr>
+              <td>{{ investigation.name }}</td>
+              <td class="text-end">{{ investigation.price | currency:'USD' }}</td>
+            </tr>
+          }
+          @for (med of bill.prescribedMeds; track med.medicineId) {
+            <tr>
+              <td>{{ med.medicineName }}</td>
+              <td class="text-end">{{ med.price | currency:'USD' }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="grand-total text-end">Grand Total</td>
+            <td class="grand-total text-end">{{ bill.grandTotal | currency:'USD' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="invoice-footer-print">
+        <p>Address: 123 Clinic St. | Phone: 0123456789</p>
+      </div>
+    }
+  </div>
+}

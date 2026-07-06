@@ -1,0 +1,281 @@
+/* Core Layout */
+:host {
+  display: block;
+  background-color: #f8f9fa; /* Soft Grey Background */
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.pharmacy-dashboard-container {
+  max-width: 1800px; /* Increased max-width for wider layout */
+  margin: 0 auto;
+}
+
+.h3 {
+  font-weight: 700;
+  color: #343a40;
+}
+
+/* Add Medicine Button */
+.btn-add-medicine {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(45deg, #28a745, #218838);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+}
+
+.btn-add-medicine:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+}
+
+/* Summary Cards */
+.summary-card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card .icon {
+  font-size: 2.5rem;
+  color: #007bff;
+  margin-right: 1.5rem;
+  opacity: 0.8;
+}
+
+.summary-card.low-stock-card .icon {
+  color: #dc3545;
+}
+
+.summary-card.expiring-soon-card .icon {
+  color: #ff9800;
+}
+
+.summary-card-body .title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card-body .value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #343a40;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.dashboard-card .card-header {
+  padding: 1rem 1.5rem;
+  background-color: #f7f9fc;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.dashboard-card .card-header h6 {
+  color: #343a40;
+  font-weight: 700;
+}
+
+.dashboard-card .card-body {
+  padding: 1.5rem;
+}
+
+/* Modern Table Styling */
+.modern-table {
+  border-collapse: separate;
+  border-spacing: 0 10px; /* Vertical spacing */
+}
+
+.modern-table thead th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c757d;
+  background: transparent;
+  border: none;
+  padding: 0 1rem 1rem;
+}
+
+.modern-table tbody tr {
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.modern-table tbody td {
+  padding: 1.25rem 1rem;
+  vertical-align: middle;
+  border: none;
+}
+
+.patient-info .patient-name, .medicine-info .medicine-name {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.patient-info .patient-id, .medicine-info .medicine-price {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.medicine-info .medicine-price {
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* Prescription & Status Styles */
+.prescription-tags .tag {
+  display: inline-block;
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.3em 0.7em;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.soft-pill {
+  padding: 0.4em 0.8em;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-bottom: 5px; /* Add margin to space out pills vertically */
+}
+
+.stock-expiry-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px; /* Add gap between pills and date */
+}
+
+.expiry-date {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.bg-soft-red {
+  background-color: #fde2e4; /* Light Red */
+  color: #dc3545;
+}
+
+.bg-hms-red {
+  background-color: #dc3545;
+  color: white;
+}
+
+.bg-soft-green {
+  background-color: #eaf6ec; /* Light Green */
+  color: #28a745;
+}
+
+.bg-soft-orange {
+  background-color: #fff0e1; /* Soft Orange */
+  color: #ff9800;
+}
+
+.expiry-info span + span {
+  margin-left: 8px;
+}
+
+/* Action Buttons */
+.btn-dispense {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-dispense:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: #e9ecef;
+  color: #007bff;
+}
+
+.btn-icon-danger:hover {
+  color: #dc3545;
+  background-color: #fde2e4;
+}
+
+/* Prescription Modal */
+#prescriptionModal .modal-content {
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+#prescriptionModal .modal-header {
+  background-color: #f7f9fc;
+  border-bottom: 1px solid #e9ecef;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+#prescriptionModal .modal-title {
+  font-weight: 700;
+  color: #343a40;
+}
+
+#prescriptionModal .list-group-item {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 1rem;
+}
+
+
+/* Responsive adjustments */
+.inventory-table .medicine-price {
+  font-size: 0.9rem;
+}
+
+/* Toggle Switch */
+.form-check-label {
+  font-weight: 600;
+  color: #495057;
+}

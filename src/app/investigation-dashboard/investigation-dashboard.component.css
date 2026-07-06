@@ -1,0 +1,251 @@
+/* Investigation Dashboard Specific Styles */
+.investigation-dashboard-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.summary-card {
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.summary-card .icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.summary-card.pending {
+  background: linear-gradient(135deg, #ffca2c, #ffc107);
+}
+
+.summary-card.processing {
+  background: linear-gradient(135deg, #31d2f2, #17a2b8);
+}
+
+.summary-card.completed {
+  background: linear-gradient(135deg, #20c997, #28a745);
+}
+
+.summary-card-body .title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card-body .value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.dashboard-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Ensures the table respects the border radius */
+}
+
+.modern-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.modern-table th {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content-wrapper {
+  width: 100%;
+  max-width: 500px;
+  padding: 1rem;
+  z-index: 1100;
+}
+
+.modal-content-card {
+  background-color: #ffffff !important; /* Solid white background */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f8f9fa;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto; /* Allow body to scroll independently */
+  flex-grow: 1;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.btn-save {
+  min-width: 120px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  background-color: #fcfcfc;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+  border-color: #80bdff;
+}
+
+.modal-footer .btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.2s;
+}
+
+.modal-footer .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+/* File Upload Drop Zone */
+.drop-zone {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  background: #fcfcfc;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.drop-zone:hover {
+  border-color: #007bff;
+  background: #f0f7ff;
+}
+
+.preview-container {
+  max-height: 200px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview-container img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Animations */
+.animated {
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.slideInUp {
+  animation-name: slideInUp;
+  animation-duration: 0.4s; /* Faster slide */
+  animation-timing-function: ease-out;
+}

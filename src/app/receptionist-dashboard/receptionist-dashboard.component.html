@@ -1,0 +1,280 @@
+<div class="container-fluid pt-4">
+
+  <!-- Header -->
+  <div class="top-bar">
+    <h1 class="h3 mb-0 text-gray-800">Receptionist Dashboard</h1>
+    <div class="d-flex ms-auto align-items-center">
+      <div class="input-group search-bar me-2">
+        <input type="text" class="form-control" placeholder="Search by National ID..." #searchId (keyup.enter)="onSearch(searchId.value)">
+        <button class="btn btn-outline-secondary" type="button" (click)="onSearch(searchId.value)">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <button class="btn btn-primary" (click)="prepareRegisterNewPatient()">
+        <i class="bi bi-plus-circle me-2"></i>Add Patient
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Card -->
+  <div class="row mt-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-danger shadow h-100">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Patients</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ patientService.patients().length }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Table -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Patient Management</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>National ID</th>
+              <th>Clinic</th>
+              <th>Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (patient of patientService.patients(); track patient.id) {
+              <tr>
+                <td>{{ patient.name }}</td>
+                <td>{{ patient.nationalId }}</td>
+                <td><span class="badge bg-info">{{ clinicService.getClinicName(patient.clinicId) }}</span></td>
+                <td>
+                  <!-- ✅ ألوان Status واضحة -->
+                  @if (patient.status === 'Pending') {
+                    <span class="badge text-white" style="background-color: #6c757d;">⏳ Pending</span>
+                  }
+                  @if (patient.status === 'In-progress' || patient.status === 'Ready') {
+                    <span class="badge text-dark" style="background-color: #ffc107;">🔄 {{ patient.status }}</span>
+                  }
+                  @if (patient.status === 'Completed') {
+                    <span class="badge text-white" style="background-color: #198754;">✅ Completed</span>
+                  }
+                  @if (patient.status !== 'Pending' && patient.status !== 'In-progress' && patient.status !== 'Ready' && patient.status !== 'Completed') {
+                    <span class="badge text-white" style="background-color: #0dcaf0;">{{ patient.status }}</span>
+                  }
+                </td>
+                <td class="text-center">
+                  <!-- ✅ شيل زرار الـ receipt (الأول على الشمال) وسيب الباقي -->
+                  <i class="bi bi-printer action-icon print" (click)="printPatient(patient)" title="Print Receipt"></i>
+                  <i class="bi bi-pencil-square action-icon edit" (click)="onEditPatient(patient)" title="Edit Patient"></i>
+                  <i class="bi bi-trash action-icon delete" (click)="onDeletePatient(patient.id)" title="Delete Patient"></i>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Book Patient Modal -->
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPatientModalLabel">{{ isBookingMode() ? 'Book New Visit' : 'Add New Patient' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="patientForm" (ngSubmit)="onAddPatient()">
+          @if (errorMessage()) {
+            <div class="alert alert-danger">{{ errorMessage() }}</div>
+          }
+          @if (successMessage()) {
+            <div class="alert alert-success">{{ successMessage() }}</div>
+          }
+
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name" [readonly]="isBookingMode()">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">National ID</label>
+            <input type="text" class="form-control" formControlName="nationalId" [readonly]="isBookingMode()" placeholder="Enter 14 digits">
+            @if (patientForm.get('nationalId')?.touched && patientForm.get('nationalId')?.invalid) {
+              <div class="text-danger small mt-1">National ID must be exactly 14 digits.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <select class="form-select" formControlName="gender" [attr.disabled]="isBookingMode() ? true : null">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="text" class="form-control" formControlName="contact" [readonly]="isBookingMode()" placeholder="Enter 11 digits">
+            @if (patientForm.get('contact')?.touched && patientForm.get('contact')?.invalid) {
+              <div class="text-danger small mt-1">Phone number must be exactly 11 digits.</div>
+            }
+          </div>
+          <!-- ✅ شيل Insurance Provider و Policy Number -->
+          <div class="mb-3">
+            <label class="form-label">Clinic</label>
+            <select class="form-select" formControlName="clinicId">
+              @for(clinic of clinicService.clinics(); track clinic.id) {
+                <option [value]="clinic.id">{{ clinic.name }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- AI Priority Analysis -->
+          <div class="mb-3">
+            <label class="form-label">Chief Complaint</label>
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="complaint"
+                placeholder="e.g. chest pain and shortness of breath">
+              <button type="button" class="btn btn-info"
+                (click)="onAnalyzePriority()"
+                [disabled]="!patientForm.get('complaint')?.value || aiService.isAnalyzingPriority()">
+                <i class="bi bi-cpu"></i>
+                {{ aiService.isAnalyzingPriority() ? '...' : 'Analyze' }}
+              </button>
+            </div>
+          </div>
+
+          @if (aiService.priorityAnalysis()) {
+            <div class="p-3 rounded border mb-3 bg-opacity-10"
+              [class.border-danger]="aiService.priorityAnalysis().priority === 'Emergency'"
+              [class.bg-danger]="aiService.priorityAnalysis().priority === 'Emergency'"
+              [class.border-warning]="aiService.priorityAnalysis().priority === 'Urgent'"
+              [class.bg-warning]="aiService.priorityAnalysis().priority === 'Urgent'"
+              [class.border-success]="aiService.priorityAnalysis().priority === 'Normal'"
+              [class.bg-success]="aiService.priorityAnalysis().priority === 'Normal'">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge fs-6"
+                  [class.bg-danger]="aiService.priorityAnalysis().priority === 'Emergency'"
+                  [class.bg-warning]="aiService.priorityAnalysis().priority === 'Urgent'"
+                  [class.text-dark]="aiService.priorityAnalysis().priority === 'Urgent'"
+                  [class.bg-success]="aiService.priorityAnalysis().priority === 'Normal'">
+                  @if (aiService.priorityAnalysis().priority === 'Emergency') { 🔴 }
+                  @if (aiService.priorityAnalysis().priority === 'Urgent') { 🟡 }
+                  @if (aiService.priorityAnalysis().priority === 'Normal') { 🟢 }
+                  {{ aiService.priorityAnalysis().priority }}
+                </span>
+              </div>
+              <p class="mb-2 small"><strong>Reason:</strong> {{ aiService.priorityAnalysis().reason }}</p>
+              @if (aiService.priorityAnalysis().recommendations?.length > 0) {
+                <strong class="small">📋 Recommendations:</strong>
+                <ul class="mb-0 mt-1">
+                  @for (rec of aiService.priorityAnalysis().recommendations; track rec) {
+                    <li class="small">{{ rec }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="patientForm.invalid">{{ isBookingMode() ? 'Book Visit' : 'Save' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Patient Modal -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPatientModalLabel">Edit Patient</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="patientForm" (ngSubmit)="onUpdatePatient()">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">National ID</label>
+            <input type="text" class="form-control" formControlName="nationalId" placeholder="Enter 14 digits">
+            @if (patientForm.get('nationalId')?.touched && patientForm.get('nationalId')?.invalid) {
+              <div class="text-danger small mt-1">National ID must be exactly 14 digits.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <select class="form-select" formControlName="gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="text" class="form-control" formControlName="contact" placeholder="Enter 11 digits">
+            @if (patientForm.get('contact')?.touched && patientForm.get('contact')?.invalid) {
+              <div class="text-danger small mt-1">Phone number must be exactly 11 digits.</div>
+            }
+          </div>
+          <!-- ✅ شيل Insurance Provider و Policy Number من Edit Modal برضو -->
+          <div class="mb-3">
+            <label class="form-label">Clinic</label>
+            <select class="form-select" formControlName="clinicId">
+              @for(clinic of clinicService.clinics(); track clinic.id) {
+                <option [value]="clinic.id">{{ clinic.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="patientForm.invalid">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="invoiceModalLabel">Generate Invoice for {{ selectedPatient()?.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="invoiceForm" (ngSubmit)="onGenerateInvoice()">
+          <div class="mb-3">
+            <label class="form-label">Amount</label>
+            <input type="number" class="form-control" formControlName="amount">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Services (comma-separated)</label>
+            <input type="text" class="form-control" formControlName="services">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="invoiceForm.invalid">Generate</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

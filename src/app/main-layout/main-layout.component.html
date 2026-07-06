@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold" style="cursor: default; user-select: none;">HMS</span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        @if (authService.currentUser()?.role === 'admin') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin">Admin</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin-analytics">System Analytics</a>
+          </li>
+        }
+        @if (authService.currentUser()?.role === 'receptionist') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/receptionist-dashboard">Receptionist</a>
+          </li>
+        }
+        @if (authService.currentUser()?.role === 'doctor') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/doctor-dashboard">Doctor</a>
+          </li>
+        }
+        @if (authService.currentUser()?.role === 'nurse') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/nurse-dashboard">Nurse</a>
+          </li>
+        }
+        @if (authService.currentUser()?.role === 'pharmacy') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/pharmacy-dashboard">Pharmacy</a>
+          </li>
+        }
+        @if (authService.currentUser()?.role === 'accountant') {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/accountant-dashboard">Accountant</a>
+          </li>
+        }
+      </ul>
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item me-3">
+          <button class="btn btn-link nav-link p-0 border-0" 
+                  (click)="themeService.toggleTheme()" 
+                  [title]="themeService.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                  style="box-shadow: none; font-size: 1.25rem;">
+            @if (themeService.isDarkMode()) {
+              <i class="bi bi-sun-fill text-warning animate-spin-once"></i>
+            } @else {
+              <i class="bi bi-moon-stars-fill text-light animate-pulse-once"></i>
+            }
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/settings">Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" style="cursor: pointer;" (click)="authService.logout()">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>

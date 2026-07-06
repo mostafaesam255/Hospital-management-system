@@ -1,0 +1,92 @@
+<div class="settings-background">
+  <div class="settings-card">
+    <div class="settings-header">
+      <h4>Account Settings</h4>
+    </div>
+    <div class="settings-body">
+      <div class="settings-sidebar">
+        <div class="profile-picture-section">
+          <div class="profile-picture">
+            <img [src]="profilePicPreview() || user()?.profilePicUrl || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'" alt="User Profile Picture">
+            <input type="file" hidden #fileInput (change)="onFileSelected($event)">
+            <button class="edit-photo-btn" (click)="fileInput.click()"><i class="bi bi-camera-fill"></i></button>
+          </div>
+          <h5 class="mt-3">{{ user()?.username }}</h5>
+          <p class="text-muted">{{ user()?.role | titlecase }}</p>
+        </div>
+        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+          <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true"><i class="bi bi-person-circle"></i> Personal Info</a>
+          <a class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" href="#v-pills-security" role="tab" aria-controls="v-pills-security" aria-selected="false"><i class="bi bi-shield-lock-fill"></i> Security</a>
+          @if (user()?.role === 'admin') {
+            <a class="nav-link" id="v-pills-clinic-tab" data-bs-toggle="pill" href="#v-pills-clinic" role="tab" aria-controls="v-pills-clinic" aria-selected="false"><i class="bi bi-building-fill"></i> Clinic Management</a>
+          }
+        </div>
+      </div>
+      <div class="settings-content">
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+            <form [formGroup]="userForm" (ngSubmit)="updateProfile()">
+              <div class="input-group-icon mb-3">
+                <i class="bi bi-envelope-fill"></i>
+                <input type="email" class="form-control" placeholder="Email" formControlName="email">
+              </div>
+              <div class="input-group-icon mb-3">
+                <i class="bi bi-telephone-fill"></i>
+                <input type="text" class="form-control" placeholder="Phone" formControlName="phone">
+              </div>
+              <div class="form-actions">
+                 <button type="submit" class="btn btn-primary btn-update" [disabled]="loading()">
+                  @if (loading()) {
+                    <span>Updating...</span>
+                  } @else {
+                    <span>Update Profile</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="tab-pane fade" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
+            <form [formGroup]="userForm" (ngSubmit)="updateProfile()">
+              <div class="input-group-icon mb-3">
+                <i class="bi bi-person-fill"></i>
+                <input type="text" class="form-control" placeholder="Username" formControlName="username">
+              </div>
+              <div class="input-group-icon mb-3">
+                <i class="bi bi-key-fill"></i>
+                <input type="password" class="form-control" placeholder="New Password" formControlName="password">
+              </div>
+              <div class="form-actions">
+                 <button type="submit" class="btn btn-primary btn-update" [disabled]="loading()">
+                  @if (loading()) {
+                    <span>Updating...</span>
+                  } @else {
+                    <span>Save Security Settings</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+          @if (user()?.role === 'admin') {
+            <div class="tab-pane fade" id="v-pills-clinic" role="tabpanel" aria-labelledby="v-pills-clinic-tab">
+              <h6>Manage Clinics</h6>
+              <ul class="list-group mb-3">
+                @for (clinic of clinicService.clinics(); track clinic.id) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ clinic.name }}
+                    <button class="btn btn-danger btn-sm" (click)="deleteClinic(clinic.id)">Delete</button>
+                  </li>
+                }
+              </ul>
+              <form [formGroup]="newClinicForm" (ngSubmit)="addClinic()">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="New clinic name" formControlName="name">
+                  <button class="btn btn-primary" type="submit">Add Clinic</button>
+                </div>
+              </form>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

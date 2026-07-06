@@ -1,0 +1,150 @@
+<div class="lookup-container">
+  <div class="search-box">
+    <h1 class="h3">Patient Record Lookup</h1>
+    <p class="text-muted">Enter a patient's National ID to retrieve their medical records.</p>
+    <div class="input-group mb-3">
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="Enter National ID..." 
+        [value]="nationalId()" 
+        (input)="onNationalIdInput($event)" 
+        (keyup.enter)="search()">
+      <button class="btn btn-primary" type="button" (click)="search()" [disabled]="!nationalId() || isSearching()">
+        @if (isSearching()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>Searching...
+        } @else {
+          <i class="bi bi-search me-2"></i>Search
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (searchPerformed()) {
+    <div class="results-container">
+      @if (patient()) {
+        <div class="patient-card card">
+          <div class="card-header">
+            <h2 class="mb-0">{{ patient()?.name }}</h2>
+            <span class="badge bg-primary">{{ getClinicName(patient()?.clinicId!) }}</span>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>National ID:</strong> {{ patient()?.nationalId }}</p>
+                <p><strong>Gender:</strong> {{ patient()?.gender }}</p>
+                <p><strong>Contact:</strong> {{ patient()?.contact }}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Insurance:</strong> {{ patient()?.insuranceProvider || 'N/A' }}</p>
+                <p><strong>Policy #:</strong> {{ patient()?.policyNumber || 'N/A' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion mt-4" id="patientAccordion">
+          <!-- Medical History -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                <i class="bi bi-journal-medical me-2"></i>Medical History
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#patientAccordion">
+              <div class="accordion-body">
+                @for (entry of sortedMedicalHistory(); track entry.date) {
+                  <div class="history-entry">
+                    <p><strong>Date:</strong> {{ entry.date | date: 'fullDate' }}</p>
+                    <p><strong>Diagnosis:</strong> {{ entry.diagnosis }}</p>
+                    <p><strong>Doctor:</strong> {{ getDoctorName(entry.doctorId) }} <span class="badge bg-secondary ms-2">{{ getClinicName(entry.clinicId) }}</span></p>
+                    <div class="row mt-2">
+                      @if (entry.prescription && entry.prescription.length > 0) {
+                        <div class="col-md-4">
+                          <h6 class="text-secondary small fw-bold">Prescriptions</h6>
+                          <ul class="ps-3 mb-0" style="font-size: 0.9rem;">
+                            @for (p of entry.prescription; track p.medicineId) {
+                              <li>{{ p.medicineName }} ({{ p.dosage }}, {{ p.frequency }})</li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                      
+                      @if (entry.requestedServices && entry.requestedServices.length > 0) {
+                        <div class="col-md-4">
+                          <h6 class="text-secondary small fw-bold">Services Provided</h6>
+                          <ul class="ps-3 mb-0" style="font-size: 0.9rem;">
+                            @for (s of entry.requestedServices; track s.name) {
+                              <li>{{ s.name }} ({{ s.price | currency:'USD':'symbol' }})</li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                      
+                      @if (getInvestigationsForVisit(entry.date, entry.doctorId).length > 0) {
+                        <div class="col-md-4">
+                          <h6 class="text-secondary small fw-bold">Investigations / Scans</h6>
+                          <ul class="ps-3 mb-0" style="font-size: 0.9rem;">
+                            @for (inv of getInvestigationsForVisit(entry.date, entry.doctorId); track inv.id) {
+                              <li>
+                                {{ inv.name }}
+                                <span class="badge rounded-pill ms-1" [class]="getStatusBadgeClass(inv.status)" style="font-size: 0.7rem; padding: 0.2em 0.5em;">{{ inv.status }}</span>
+                              </li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Investigation Reports -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                <i class="bi bi-file-earmark-zip me-2"></i>Investigation Reports
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#patientAccordion">
+              <div class="accordion-body">
+                @for (investigation of patient()?.investigations; track investigation.id) {
+                  <div class="investigation-entry mb-4 pb-3 border-bottom">
+                    <p class="mb-2">
+                      <strong>{{ investigation.name }}</strong>
+                      <span class="text-muted small ms-2">({{ investigation.date | date: 'mediumDate' }})</span>
+                      - <span class="badge ms-2" [class]="getStatusBadgeClass(investigation.status)">{{ investigation.status }}</span>
+                    </p>
+
+                    @if (investigation.result) {
+                      <p class="mb-1"><strong>Result:</strong> {{ investigation.result }}</p>
+                    }
+                    @if (investigation.report) {
+                      <div class="bg-light p-2 rounded mb-2" style="font-size: 0.9rem; border-left: 3px solid #6c757d;">
+                        <strong>Technician Notes:</strong>
+                        <p class="mb-0 text-muted" style="white-space: pre-wrap;">{{ investigation.report }}</p>
+                      </div>
+                    }
+
+                    @if (investigation.attachment) {
+                      <button class="btn btn-sm btn-outline-info" (click)="openAttachment(investigation.attachment)">
+                        <i class="bi bi-image me-1"></i>View Attachment
+                      </button>
+                    }
+                  </div>
+                } @empty {
+                  <p class="text-center text-muted py-3">No investigation reports available.</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+      } @else {
+        <div class="alert alert-warning text-center">{{ errorMessage() }}</div>
+      }
+    </div>
+  }
+</div>

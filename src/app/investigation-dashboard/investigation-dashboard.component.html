@@ -1,0 +1,132 @@
+<div class="investigation-dashboard-container">
+  <!-- Header Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="summary-card pending">
+        <div class="icon"><i class="bi bi-clock-history"></i></div>
+        <div class="summary-card-body">
+          <div class="title">Pending Tests</div>
+          <div class="value">{{ pendingCount() }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card processing">
+        <div class="icon"><i class="bi bi-arrow-repeat"></i></div>
+        <div class="summary-card-body">
+          <div class="title">Processing</div>
+          <div class="value">{{ processingCount() }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="summary-card completed">
+        <div class="icon"><i class="bi bi-check2-circle"></i></div>
+        <div class="summary-card-body">
+          <div class="title">Completed</div>
+          <div class="value">{{ completedCount() }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h6>Investigation Queue</h6>
+    </div>
+    <div class="card-body">
+      @if (investigations().length > 0) {
+      <table class="table modern-table">
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Test Type</th>
+            <th>Requested Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (investigation of investigations(); track investigation.id) {
+          <tr>
+            <td>
+              <div class="patient-info">
+                <div class="patient-name">{{ investigation.patientName }}</div>
+              </div>
+            </td>
+            <td>{{ investigation.name }}</td>
+            <td>{{ investigation.date | date: 'medium' }}</td>
+            <td>
+              <span class="badge rounded-pill" [class.bg-warning]="investigation.status === 'Requested'" [class.bg-info]="investigation.status === 'In Progress'"
+                [class.bg-success]="investigation.status === 'Results Ready'">{{ investigation.status }}</span>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="openResultModal(investigation)">Enter Result</button>
+              @if (investigation.type === 'scan') {
+              <button class="btn btn-icon btn-secondary-outline ms-2" (click)="viewAttachment(investigation)">
+                <i class="bi bi-paperclip"></i>
+              </button>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      } @else {
+      <div class="empty-state">
+        <i class="bi bi-beaker"></i>
+        <p>No Pending Tests</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Result Entry Modal -->
+@if (showResultModal()) {
+<div class="modal-overlay animated fadeIn">
+  <div class="modal-content-wrapper">
+    <div class="modal-content-card animated slideInUp">
+      <div class="modal-header">
+        <h5 class="modal-title">Enter Result for {{ selectedInvestigation()?.name }} - {{ selectedInvestigation()?.patientName }}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeResultModal()"></button>
+      </div>
+      <form [formGroup]="resultForm" (ngSubmit)="onResultSubmit()">
+        <div class="modal-body">
+          <div class="form-group mb-3">
+            <label for="result">Result</label>
+            <input type="text" class="form-control" id="result" formControlName="result" placeholder="e.g., 140 mg/dL">
+          </div>
+          <div class="form-group mb-3">
+            <label for="report">Technician Notes</label>
+            <textarea class="form-control" id="report" rows="4" formControlName="report" placeholder="Add any relevant notes here..."></textarea>
+          </div>
+
+          <!-- File Upload Drop Zone -->
+          <div class="form-group mb-3">
+            <label>Attachment</label>
+            <div class="drop-zone" (click)="fileInput.click()">
+              <input type="file" hidden #fileInput accept="image/*,application/pdf" (change)="onFileSelected($event)">
+              @if (!selectedFilePreview()) {
+              <div class="text-center">
+                <i class="bi bi-cloud-arrow-up-fill fs-1 text-muted"></i>
+                <p>Click to upload or Drag & Drop Scans (JPG, PNG, PDF)</p>
+              </div>
+              } @else {
+              <div class="preview-container">
+                <img [src]="selectedFilePreview()" class="img-fluid rounded" alt="File preview">
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeResultModal()">Cancel</button>
+          <button type="submit" class="btn btn-success btn-save" [disabled]="resultForm.invalid">Save Result</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}

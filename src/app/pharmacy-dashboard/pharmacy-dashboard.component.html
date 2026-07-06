@@ -1,0 +1,376 @@
+<div class="pharmacy-dashboard-container">
+
+  @if (successMessage(); as message) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" (click)="successMessage.set(null)" aria-label="Close"></button>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Pharmacy Workspace</h1>
+    <button class="btn btn-add-medicine" data-bs-toggle="modal" data-bs-target="#addMedicineModal" (click)="medicineForm.reset()">
+      <i class="bi bi-plus-circle me-2"></i>Add New Medicine
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row">
+    <div class="col-xl-3 col-md-6">
+      <div class="summary-card">
+        <i class="bi bi-hourglass-split icon"></i>
+        <div class="summary-card-body">
+          <div class="title">Pending Orders</div>
+          <div class="value">{{ patients().length }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="summary-card">
+        <i class="bi bi-box-seam icon"></i>
+        <div class="summary-card-body">
+          <div class="title">Total Inventory Value</div>
+          <div class="value">{{ totalInventoryValue() | currency }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="summary-card low-stock-card">
+        <i class="bi bi-exclamation-triangle icon"></i>
+        <div class="summary-card-body">
+          <div class="title">Low Stock Alerts</div>
+          <div class="value">{{ lowStockCount() }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="summary-card expiring-soon-card">
+        <i class="bi bi-alarm icon"></i>
+        <div class="summary-card-body">
+          <div class="title">Expiring Soon</div>
+          <div class="value">{{ expiringSoonCount() }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Queue & Inventory Section -->
+  <div class="row mt-4">
+    <!-- Patient Queue -->
+    <div class="col-lg-6">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h6 class="m-0 font-weight-bold">Pending Prescriptions</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table modern-table" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th class="text-center">Prescription</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (patient of patients(); track patient.id) {
+                  <tr>
+                    <td>
+                      <div class="patient-info">
+                        <div class="patient-name">{{ patient.name }}</div>
+                        <div class="patient-id">ID: {{ patient.nationalId }}</div>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      @if (patient.medicalHistory.length > 0 && patient.medicalHistory[patient.medicalHistory.length - 1].prescription) {
+                        <button class="btn btn-sm btn-outline-primary" (click)="openPrescriptionModal(patient)">
+                          <i class="bi bi-file-text me-1"></i> View
+                        </button>
+                      } @else {
+                        <span class="text-muted">No Prescription</span>
+                      }
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-dispense" (click)="openDispenseModal(patient)">
+                        Dispense medication
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="3" class="text-center py-5">
+                      <i class="bi bi-person-bounding-box" style="font-size: 3rem; color: #e0e0e0;"></i>
+                      <h5 class="mt-3">Patient queue is empty.</h5>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medication Inventory -->
+    <div class="col-lg-6">
+      <div class="dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold">Medication Inventory</h6>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="expiringSoonToggle" [checked]="showOnlyExpiringSoon()" (change)="showOnlyExpiringSoon.set(!showOnlyExpiringSoon())">
+            <label class="form-check-label" for="expiringSoonToggle">Show Expiring Soon</label>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table modern-table inventory-table" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Stock & Expiry</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (medicine of filteredMedicines(); track medicine.id) {
+                  <tr [class.bg-warning-subtle]="isExpiringSoon(medicine.expiryDate) && !isExpired(medicine.expiryDate)">
+                    <td>
+                      <div class="medicine-info">
+                        <div class="medicine-name">{{ medicine.name }}</div>
+                        <div class="medicine-price">{{ medicine.price | currency }}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="stock-expiry-container">
+                        @if (isExpired(medicine.expiryDate)) {
+                          <span class="soft-pill bg-hms-red">Expired</span>
+                        } @else if (isExpiringSoon(medicine.expiryDate)) {
+                          <span class="soft-pill bg-soft-orange">Expiring Soon</span>
+                        } @else if (medicine.quantity <= medicine.minStock) {
+                          <span class="soft-pill bg-soft-red">Low Stock</span>
+                        } @else {
+                          <span class="soft-pill bg-soft-green">In Stock</span>
+                        }
+                        <div class="expiry-date">{{ formatExpiryDate(medicine.expiryDate) }}</div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <button class="btn-icon" data-bs-toggle="modal" data-bs-target="#editMedicineModal" (click)="onEditMedicine(medicine)">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                      <button class="btn-icon btn-icon-danger" (click)="onDeleteMedicine(medicine.id)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="3" class="text-center py-5">
+                      <i class="bi bi-box-seam" style="font-size: 3rem; color: #e0e0e0;"></i>
+                      <h5 class="mt-3">No medication in inventory.</h5>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prescription Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1" aria-labelledby="prescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prescriptionModalLabel">Prescription Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      @if (selectedPatient(); as patient) {
+        <div class="modal-body">
+          <h6>Patient: {{ patient.name }}</h6>
+          @if (selectedPrescription(); as prescription) {
+            <ul class="list-group list-group-flush">
+              @for (med of prescription; track med.medicineId) {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>{{ med.medicineName }}</span>
+                  <span class="badge bg-primary rounded-pill">{{ med.dosage }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="text-muted">No prescription found.</p>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Dispense Modal مع AI Drug Interaction -->
+<div class="modal fade" id="dispenseModal" tabindex="-1" aria-labelledby="dispenseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dispenseModalLabel">Confirm Dispense</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      @if (selectedPatient(); as patient) {
+        <div class="modal-body">
+          <p>Are you sure you want to dispense the prescribed medication for <strong>{{ patient.name }}</strong>?</p>
+
+          <!-- Loading -->
+          @if (aiService.isAnalyzingInteractions()) {
+            <div class="alert alert-info d-flex align-items-center gap-2">
+              <div class="spinner-border spinner-border-sm" role="status"></div>
+              <span>🔍 Checking for drug interactions...</span>
+            </div>
+          }
+
+          <!-- نتيجة التحليل -->
+          @if (aiService.drugInteractions(); as result) {
+            @if (result.safe) {
+              <!-- ✅ آمن -->
+              <div class="alert alert-success d-flex align-items-center gap-2 mb-0">
+                <i class="bi bi-shield-check fs-5"></i>
+                <strong>No drug interactions found. Safe to dispense.</strong>
+              </div>
+            } @else {
+              <!-- ⚠️ فيه تداخل -->
+              <div class="alert alert-danger mb-0">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                  <strong>Drug Interaction Warning!</strong>
+                </div>
+                <hr class="my-2">
+                @for (interaction of result.interactions; track interaction.drugs) {
+                  <div class="p-2 rounded mb-2" style="background: rgba(255,255,255,0.4)">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                      <span class="badge"
+                        [class.bg-danger]="interaction.severity === 'High'"
+                        [class.bg-warning]="interaction.severity === 'Moderate'"
+                        [class.text-dark]="interaction.severity === 'Moderate' || interaction.severity === 'Low'"
+                        [class.bg-info]="interaction.severity === 'Low'">
+                        {{ interaction.severity === 'High' ? '🔴' : interaction.severity === 'Moderate' ? '🟡' : '🔵' }}
+                        {{ interaction.severity }}
+                      </span>
+                      <strong class="small">{{ interaction.drugs.join(' + ') }}</strong>
+                    </div>
+                    <p class="mb-1 small"><strong>Effect:</strong> {{ interaction.effect }}</p>
+                    <p class="mb-0 small"><strong>Action:</strong> {{ interaction.recommendation }}</p>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <!-- ✅ الزرار بيتغير أحمر لو في تداخل خطير -->
+          <button type="button"
+            class="btn"
+            [class.btn-danger]="aiService.drugInteractions() && !aiService.drugInteractions().safe"
+            [class.btn-primary]="!aiService.drugInteractions() || aiService.drugInteractions().safe"
+            [disabled]="aiService.isAnalyzingInteractions()"
+            (click)="onDispenseMedication()">
+            @if (aiService.isAnalyzingInteractions()) {
+              Checking...
+            } @else if (aiService.drugInteractions() && !aiService.drugInteractions().safe) {
+              ⚠️ Dispense Anyway
+            } @else {
+              Dispense
+            }
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Add Medicine Modal -->
+<div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addMedicineModalLabel">Add New Medicine</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="medicineForm" (ngSubmit)="onAddMedicine()">
+          <div class="mb-3"><label class="form-label">Name</label><input type="text" class="form-control" formControlName="name"></div>
+          <div class="mb-3"><label class="form-label">Quantity</label><input type="number" class="form-control" formControlName="quantity"></div>
+          <div class="mb-3"><label class="form-label">Price</label><input type="number" class="form-control" formControlName="price"></div>
+          <div class="mb-3"><label class="form-label">Minimum Stock</label><input type="number" class="form-control" formControlName="minStock"></div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <label class="form-label">Expiry Month</label>
+              <select class="form-select" formControlName="expiryMonth">
+                @for(month of months; track month.value) {
+                  <option [value]="month.value">{{ month.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Expiry Year</label>
+              <select class="form-select" formControlName="expiryYear">
+                @for(year of years; track year) {
+                  <option [value]="year">{{ year }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="medicineForm.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Medicine Modal -->
+<div class="modal fade" id="editMedicineModal" tabindex="-1" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editMedicineModalLabel">Edit Medicine</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="medicineForm" (ngSubmit)="onUpdateMedicine()">
+          <div class="mb-3"><label class="form-label">Name</label><input type="text" class="form-control" formControlName="name"></div>
+          <div class="mb-3"><label class="form-label">Quantity</label><input type="number" class="form-control" formControlName="quantity"></div>
+          <div class="mb-3"><label class="form-label">Price</label><input type="number" class="form-control" formControlName="price"></div>
+          <div class="mb-3"><label class="form-label">Minimum Stock</label><input type="number" class="form-control" formControlName="minStock"></div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <label class="form-label">Expiry Month</label>
+              <select class="form-select" formControlName="expiryMonth">
+                @for(month of months; track month.value) {
+                  <option [value]="month.value">{{ month.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Expiry Year</label>
+              <select class="form-select" formControlName="expiryYear">
+                @for(year of years; track year) {
+                  <option [value]="year">{{ year }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" [disabled]="medicineForm.invalid">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

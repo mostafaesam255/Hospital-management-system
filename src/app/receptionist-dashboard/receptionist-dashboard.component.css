@@ -1,0 +1,123 @@
+/* Global Styling */
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Card & Header */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+  border: none;
+  /* transition from global .card rule */
+}
+
+.card.border-left-danger {
+  border-left: 5px solid #dc3545 !important;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid #e3e6f0;
+  padding: 0.75rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  flex-grow: 1;
+  margin-right: 1rem;
+}
+
+/* Table Refinement */
+.table thead th {
+  background-color: #f8f9fa;
+  color: #495057;
+  border-bottom-width: 1px;
+  padding: 1rem;
+}
+
+.table td, .table th {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Desktop-only hover */
+@media (hover: hover) and (pointer: fine) {
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+/* Status Badge Pills — transition from global .badge */
+.badge {
+  padding: 0.5em 0.9em;
+  border-radius: 10rem;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.bg-secondary { background-color: #6c757d !important; color: white; }
+.bg-warning   { background-color: #ffc107 !important; color: #212529; }
+.bg-success   { background-color: #28a745 !important; color: white; }
+.bg-info      { background-color: #17a2b8 !important; color: white; }
+
+/* Action Icons — specific transition, no `all` */
+.action-icon {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin: 0 5px;
+  /* Specific: only transform */
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+              color     160ms cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-block;
+}
+
+/* Desktop-only hover for icons */
+@media (hover: hover) and (pointer: fine) {
+  .action-icon:hover {
+    transform: scale(1.2);
+    color: #212529;
+  }
+}
+
+/* Icon active press — like buttons */
+.action-icon:active {
+  transform: scale(0.9);
+}
+
+.action-icon.print  { color: #007bff; }
+.action-icon.edit   { color: #ffc107; }
+.action-icon.delete { color: #dc3545; }
+
+/* Print-specific styles */
+@media print {
+  body * { visibility: hidden; }
+  .receipt-container, .receipt-container * { visibility: visible; }
+  .receipt-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none !important;
+  }
+  nav, .btn, .no-print, .top-bar, .action-icon { display: none !important; }
+}
+
+.receipt-container {
+  padding: 20px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
