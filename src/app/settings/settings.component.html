@@ -17,6 +17,7 @@
         <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
           <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true"><i class="bi bi-person-circle"></i> Personal Info</a>
           <a class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" href="#v-pills-security" role="tab" aria-controls="v-pills-security" aria-selected="false"><i class="bi bi-shield-lock-fill"></i> Security</a>
+          <a class="nav-link" id="v-pills-ai-tab" data-bs-toggle="pill" href="#v-pills-ai" role="tab" aria-controls="v-pills-ai" aria-selected="false"><i class="bi bi-cpu-fill"></i> AI Settings</a>
           @if (user()?.role === 'admin') {
             <a class="nav-link" id="v-pills-clinic-tab" data-bs-toggle="pill" href="#v-pills-clinic" role="tab" aria-controls="v-pills-clinic" aria-selected="false"><i class="bi bi-building-fill"></i> Clinic Management</a>
           }
@@ -66,6 +67,23 @@
               </div>
             </form>
           </div>
+
+          <div class="tab-pane fade" id="v-pills-ai" role="tabpanel" aria-labelledby="v-pills-ai-tab">
+            <h6>Groq AI Configuration</h6>
+            <p class="text-muted small">Your Groq API key is stored locally in your browser and is never sent to GitHub or any server.</p>
+            <form [formGroup]="aiForm" (ngSubmit)="saveAiSettings()">
+              <div class="input-group-icon mb-3">
+                <i class="bi bi-key-fill"></i>
+                <input type="password" class="form-control" placeholder="Enter Groq API Key (gsk_...)" formControlName="apiKey">
+              </div>
+              <div class="form-actions">
+                 <button type="submit" class="btn btn-primary btn-update">
+                  <span>Save AI Key</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
           @if (user()?.role === 'admin') {
             <div class="tab-pane fade" id="v-pills-clinic" role="tabpanel" aria-labelledby="v-pills-clinic-tab">
               <h6>Manage Clinics</h6>

@@ -4,7 +4,9 @@ import { PharmacyService } from '../pharmacy/pharmacy.service';
 @Injectable({ providedIn: 'root' })
 export class AIService {
   private pharmacyService = inject(PharmacyService);
-  private apiKey = 'YOUR_GROQ_API_KEY';
+  private get apiKey(): string {
+    return localStorage.getItem('hms_groq_api_key') || '';
+  }
   private apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
   // Doctor

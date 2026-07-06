@@ -36,7 +36,14 @@ export class SettingsComponent {
     email: [''],
   });
 
+  public aiForm = this.fb.group({
+    apiKey: ['']
+  });
+
   constructor() {
+    const currentKey = localStorage.getItem('hms_groq_api_key') || '';
+    this.aiForm.patchValue({ apiKey: currentKey });
+
     effect(() => {
       const currentUser = this.user();
       if (currentUser) {
@@ -48,6 +55,12 @@ export class SettingsComponent {
         this.profilePicPreview.set(currentUser.profilePicUrl || null);
       }
     });
+  }
+
+  saveAiSettings() {
+    const key = this.aiForm.value.apiKey || '';
+    localStorage.setItem('hms_groq_api_key', key.trim());
+    this.toastService.show('Groq API Key saved successfully! 🧠', 'success');
   }
 
   onFileSelected(event: Event): void {
